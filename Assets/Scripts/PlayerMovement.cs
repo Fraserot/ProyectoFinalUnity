@@ -10,7 +10,6 @@ public class PlayerMovement : NetworkBehaviour
     public Rigidbody2D rb;
     private Animator animator;
 
-
     private int state;
 
     private void Start()
@@ -21,7 +20,7 @@ public class PlayerMovement : NetworkBehaviour
     void Update()
     {
         if (!IsOwner) return;
-        
+
         Vector2 movement = Vector2.zero;
 
         if (Input.GetKey(KeyCode.A))
