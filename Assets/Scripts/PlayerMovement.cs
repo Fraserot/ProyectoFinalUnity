@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using JetBrains.Annotations;
 
 public class PlayerMovement : NetworkBehaviour
 {
@@ -9,12 +10,13 @@ public class PlayerMovement : NetworkBehaviour
     [SerializeField] private float speed;
     public Rigidbody2D rb;
     private Animator animator;
-
+    public GameObject cameraHolder;
     private int state;
 
     private void Start()
     {
         animator = GetComponent<Animator>();
+
     }
 
     void Update()
@@ -45,13 +47,16 @@ public class PlayerMovement : NetworkBehaviour
         }
         animator.SetInteger("State", state);
         movement = movement.normalized;
-        rb.velocity = new Vector2(movement.x *speed, movement.y * speed);
+        rb.velocity = new Vector2(movement.x * speed, movement.y * speed);
     }
-    //En un futuro pues, para organizar
-    private void Animations()
+    //Confirmacion de camara Online
+    public override void OnNetworkSpawn()
     {
-        
-
-
+        cameraHolder.SetActive(IsOwner);
+        base.OnNetworkSpawn();
     }
+
+
+
 }
+
