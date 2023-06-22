@@ -276,6 +276,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 7
   rb: {fileID: 520089589186987738}
+  cameraHolder: {fileID: 520089588596534831}
 --- !u!50 &520089589186987738
 Rigidbody2D:
   serializedVersion: 4
