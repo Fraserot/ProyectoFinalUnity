@@ -1,14 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : NetworkBehaviour
 {
 
     [SerializeField] private float speed;
     public Rigidbody2D rb;
     private Animator animator;
-
 
     private int state;
 
@@ -19,6 +19,8 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        if (!IsOwner) return;
+
         Vector2 movement = Vector2.zero;
 
         if (Input.GetKey(KeyCode.A))
