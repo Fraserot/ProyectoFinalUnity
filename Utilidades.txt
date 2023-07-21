@@ -1,0 +1,4 @@
+Tecnologias utilizadas
+
+Lobby: Sistema de pago dependiendo de la masividad del proyecto donde los jugadores pueden crear lobbies personalizados para iniciar sus propios mapas.
+En este caso, Lo usaremos para implementar los salones de clase con su codigo unico, asi dando seguridad a la hora de unirse a una sala.
