@@ -8,6 +8,12 @@ using UnityEngine;
 
 public class GameLobbyManager : Singleton<GameLobbyManager>
 {
+
+    public string GetLobbyCode()
+    {
+        return LobbyManager.Instance.GetLobbyCode();
+    }
+
     public async Task<bool> CreateLobby()
     {
         Dictionary<string, string> playerData = new Dictionary<string, string>()
@@ -21,9 +27,14 @@ public class GameLobbyManager : Singleton<GameLobbyManager>
 
         return succeded;
     }
-
-    public string GetLobbyCode()
+    
+    public async Task <bool> JoinLobby(string code)
     {
-        return LobbyManager.Instance.GetLobbyCode();
+        Dictionary<string, string> playerData = new Dictionary<string, string>()
+        {
+            {"GamerTag", "JoinPlayer" }
+        };
+        bool succeded = await LobbyManager.Instance.JoinLobby(code, playerData);
+        return succeded;
     }
 }
