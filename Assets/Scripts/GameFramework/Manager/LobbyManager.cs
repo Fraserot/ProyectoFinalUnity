@@ -1,3 +1,4 @@
+using GameFramework.Events;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -77,6 +78,7 @@ namespace GameFramework.Core.GameFramework.Manager
                 if (newLobby.LastUpdated > _lobby.LastUpdated) 
                 {
                     _lobby = newLobby;
+                    LobbyEvents.OnLobbyUpdated.Invoke(_lobby);
                 }
                 yield return new WaitForSeconds(waitTimeSeconds);
             }
@@ -124,6 +126,17 @@ namespace GameFramework.Core.GameFramework.Manager
             _refreshLobbyCoroutine = StartCoroutine(RefreshLobbyCoroutine(_lobby.Id, 1f));
             return true;
 
+        }
+
+        public List<Dictionary<string, PlayerDataObject>> GetPlayersData()
+        {
+            List<Dictionary<string, PlayerDataObject>> data = new List<Dictionary<string, PlayerDataObject>> ();
+            foreach (Player player in _lobby.Players)
+            {
+                data.Add(player.Data);
+            }
+
+            return data;
         }
     }
 }
