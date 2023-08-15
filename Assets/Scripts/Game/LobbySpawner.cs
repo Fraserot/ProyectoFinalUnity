@@ -17,7 +17,7 @@ namespace Game
 
         private void OnDisable()
         {
-            
+            LobbyEvents.OnLobbyUpdated -= OnLobbyUpdated;
         }
 
         private void OnLobbyUpdated()
