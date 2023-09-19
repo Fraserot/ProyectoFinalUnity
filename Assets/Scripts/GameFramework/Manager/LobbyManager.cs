@@ -23,7 +23,7 @@ namespace GameFramework.Core.GameFramework.Manager
         }
 
         // Método para crear un nuevo lobby.
-        public async Task<bool> CreateLobby(int maxPlayers, bool isPrivate, Dictionary<string, string> data)
+        public async Task<bool> CreateLobby(int maxPlayers, bool isPrivate, Dictionary<string, string> data,Dictionary<string, string> lobbyData)
         {
             // Serializa los datos del jugador en el formato necesario para el lobby.
             Dictionary<string, PlayerDataObject> playerData = SerializePlayerData(data);
@@ -34,6 +34,7 @@ namespace GameFramework.Core.GameFramework.Manager
             // Crea las opciones de creación del lobby.
             CreateLobbyOptions options = new CreateLobbyOptions()
             {
+                Data = SerializeLobbyData(lobbyData),
                 IsPrivate = isPrivate,
                 Player = player 
             };
@@ -55,6 +56,21 @@ namespace GameFramework.Core.GameFramework.Manager
             _refreshLobbyCoroutine = StartCoroutine(RefreshLobbyCoroutine(_lobby.Id, 1f));
 
             return true; 
+        }
+
+        private Dictionary<string, DataObject> SerializeLobbyData(Dictionary<string, string> data)
+        {
+            Dictionary<string, DataObject> lobbyData = new Dictionary<string, DataObject>();
+
+            foreach (var(key, value) in data)
+            {
+                lobbyData.Add(key, new DataObject (
+                        visibility: DataObject.VisibilityOptions.Member,
+                        value: value
+                    ));
+            }
+
+            return lobbyData;
         }
 
         //Contar los pulsos del server
@@ -156,6 +172,29 @@ namespace GameFramework.Core.GameFramework.Manager
                 return false;
             }
 
+            LobbyEvents.OnLobbyUpdated(_lobby);
+
+            return true;
+        }
+
+        public async Task<bool> UpdateLobbyData(Dictionary<string,string> data)
+        {
+            Dictionary<string, DataObject> lobbyData = SerializeLobbyData(data);
+
+            UpdateLobbyOptions options = new UpdateLobbyOptions()
+            {
+                Data = lobbyData
+
+            };
+
+            try
+            {
+              _lobby=  await LobbyService.Instance.UpdateLobbyAsync(_lobby.Id, options);
+            }
+            catch (System.Exception)
+            {
+                return false;
+            }
             LobbyEvents.OnLobbyUpdated(_lobby);
 
             return true;
