@@ -7,7 +7,7 @@ namespace Game.Events
         public static LobbyUpdated OnLobbyUpdated;
 
         public delegate void LobbyReady();
-        public static LobbyUpdated OnLobbyReady;
+        public static LobbyReady OnLobbyReady;
     }
 }
 

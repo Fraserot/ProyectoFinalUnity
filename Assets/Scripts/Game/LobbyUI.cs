@@ -32,9 +32,9 @@ namespace Game
                 _leftBtn.onClick.AddListener(OnLeftButtonClicked);
                 _startBtn.onClick.AddListener(OnStartBtnClicked);
 
-                LobbyEvents.OnLobbyUpdated += OnLobbyUpdated;
                 LobbyEvents.OnLobbyReady += OnLobbyReady;
             }
+            LobbyEvents.OnLobbyUpdated += OnLobbyUpdated;
 
         }
 
@@ -45,7 +45,6 @@ namespace Game
             _readyBtn.onClick.RemoveAllListeners();
             _rightBtn.onClick.RemoveAllListeners();
             _leftBtn.onClick.RemoveAllListeners();
-            _startBtn.onClick.RemoveAllListeners();
 
 
             LobbyEvents.OnLobbyUpdated -= OnLobbyUpdated;
@@ -76,7 +75,7 @@ namespace Game
             }
 
             UpdateMap();
-            await GameLobbyManager.Instance.SetSelectedMap(_currentMapIndex);
+            await GameLobbyManager.Instance.SetSelectedMap(_currentMapIndex, _mapSelectionData.Maps[_currentMapIndex].SceneName);
         }
 
 
@@ -93,7 +92,7 @@ namespace Game
                     _currentMapIndex = _mapSelectionData.Maps.Count - 1;
                 }
                 UpdateMap();
-               await GameLobbyManager.Instance.SetSelectedMap(_currentMapIndex);
+               await GameLobbyManager.Instance.SetSelectedMap(_currentMapIndex, _mapSelectionData.Maps[_currentMapIndex].SceneName);
 
             }
         }
@@ -135,7 +134,7 @@ namespace Game
 
         private async void OnStartBtnClicked()
         {
-             await GameLobbyManager.Instance.StartGame(_mapSelectionData.Maps[_currentMapIndex].SceneName);
+             await GameLobbyManager.Instance.StartGame();
         }
     }
 }

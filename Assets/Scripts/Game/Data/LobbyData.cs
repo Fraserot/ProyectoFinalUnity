@@ -7,6 +7,7 @@ namespace GameFramework.Core.Data
     {
         private int _mapIndex;
         private string _relayJoinCode;
+        private string _sceneName;
 
         public int MapIndex
         {
@@ -17,6 +18,11 @@ namespace GameFramework.Core.Data
             
             get => _relayJoinCode;  
             set => _relayJoinCode = value; 
+        }
+        public string SceneName
+        {
+            get => _sceneName;
+            set => _sceneName = value;
         }
 
         public void Initialize(int mapIndex)
@@ -33,22 +39,29 @@ namespace GameFramework.Core.Data
         {
             if (lobbyData.ContainsKey("MapIndex"))
             {
-                _mapIndex = Int32.Parse(lobbyData["MapIndex"].Value);
+                _mapIndex = int.Parse(lobbyData["MapIndex"].Value);
             }
 
             if (lobbyData.ContainsKey("RelayJoinCode"))
             {
-                _relayJoinCode = lobbyData["MapIndex"].Value;
+                _relayJoinCode = lobbyData["RelayJoinCode"].Value;
             }
 
+            if (lobbyData.ContainsKey("SceneName"))
+            {
+                _sceneName = lobbyData["SceneName"].Value;
+ 
+            }
         }
+
 
         public Dictionary<string, string> Serialize()
         {
             return new Dictionary<string, string>() 
             {
                 {"MapIndex", _mapIndex.ToString()},
-                {"RelayJoinCode", _relayJoinCode}
+                {"RelayJoinCode", _relayJoinCode},
+                {"SceneName", _sceneName}
 
             };
         }

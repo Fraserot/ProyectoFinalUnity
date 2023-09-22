@@ -2,6 +2,7 @@ using GameFramework.Core;
 using GameFramework.Core.Data;
 using GameFramework.Core.GameFramework.Manager;
 using GameFramework.Events;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Services.Authentication;
@@ -68,7 +69,7 @@ namespace Game
             return succeeded;
         }
 
-        private void OnLobbyUpdated(Lobby lobby)
+        private async void OnLobbyUpdated(Lobby lobby)
         {
             // Obtiene los datos de los jugadores en el lobby
             List<Dictionary<string, PlayerDataObject>> playerData = LobbyManager.Instance.GetPlayersData();
@@ -104,6 +105,13 @@ namespace Game
                 Events.LobbyEvents.OnLobbyReady?.Invoke();
             }
 
+            if(_lobbyData.RelayJoinCode != default)
+            {
+               await JoinRelayServer(_lobbyData.RelayJoinCode);
+               SceneManager.LoadSceneAsync(_lobbyData.SceneName);
+            }
+
+            Console.WriteLine($"Nombre de la escena actual: {_lobbyData.SceneName}");
 
         }
 
@@ -126,14 +134,15 @@ namespace Game
             return _lobbyData.MapIndex;
         }
 
-        public async Task<bool> SetSelectedMap(int currentMapIndex)
+        public async Task<bool> SetSelectedMap(int currentMapIndex, string sceneName)
         {
             _lobbyData.MapIndex = currentMapIndex;
-            
+            _lobbyData.SceneName = sceneName;
+
             return await LobbyManager.Instance.UpdateLobbyData(_lobbyData.Serialize());
         }
 
-        public async Task StartGame(string sceneName)
+        public async Task StartGame()
         {
             string RelayJoinCode = await RelayManager.Instance.CreateRelay(_maxPlayerSize);
 
@@ -144,19 +153,30 @@ namespace Game
             string connectionData = RelayManager.Instance.GetConnectionData();
             await LobbyManager.Instance.UpdatePlayerData(localLobbyPlayerData.Id, localLobbyPlayerData.Serialize(), allocationId, connectionData);
 
-            SceneManager.LoadSceneAsync(sceneName);
+            SceneManager.LoadSceneAsync(_lobbyData.SceneName);
+            Console.WriteLine($"Nombre de la escena actual: {_lobbyData.SceneName}");
+
         }
 
-        //private async Task<bool> JoinRelayServer(string relayJoinCode)
-        //{
-        //    await RelayManager.Instance.JoinRelay(relayJoinCode);
-        //    string allocationId = RelayManager.Instance.GetAllocationId();
-        //    string connectionData = RelayManager.Instance.GetConnectionData();
+        public async Task JoinRelayServer(string relayJoinCode)
+        {
+            try
+            {
+                await RelayManager.Instance.JoinRelay(relayJoinCode);
+                string allocationId = RelayManager.Instance.GetAllocationId();
+                string connectionData = RelayManager.Instance.GetConnectionData();
 
-        //    await LobbyManager.Instance.UpdatePlayerData(localLobbyPlayerData.Id, localLobbyPlayerData.Serialize(), allocationId, connectionData);
+                await LobbyManager.Instance.UpdatePlayerData(localLobbyPlayerData.Id, localLobbyPlayerData.Serialize(), allocationId, connectionData);
 
-        //    return true;
-        //}
+                
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error al unirse al servidor Relay: {ex.Message}");
+                
+            }
+        }
+
     }
 
 }
