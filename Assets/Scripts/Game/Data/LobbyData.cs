@@ -1,18 +1,22 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Services.Lobbies.Models;
-using UnityEngine;
 namespace GameFramework.Core.Data
 {
     public class LobbyData
     {
         private int _mapIndex;
+        private string _relayJoinCode;
 
         public int MapIndex
         {
             get => _mapIndex;
             set => _mapIndex = value;
+        }
+        public string RelayJoinCode {
+            
+            get => _relayJoinCode;  
+            set => _relayJoinCode = value; 
         }
 
         public void Initialize(int mapIndex)
@@ -31,15 +35,25 @@ namespace GameFramework.Core.Data
             {
                 _mapIndex = Int32.Parse(lobbyData["MapIndex"].Value);
             }
+
+            if (lobbyData.ContainsKey("RelayJoinCode"))
+            {
+                _relayJoinCode = lobbyData["MapIndex"].Value;
+            }
+
         }
 
         public Dictionary<string, string> Serialize()
         {
             return new Dictionary<string, string>() 
             {
-                {"MapIndex", _mapIndex.ToString()}
+                {"MapIndex", _mapIndex.ToString()},
+                {"RelayJoinCode", _relayJoinCode}
+
             };
         }
+
+
     }
 }
 

@@ -2,29 +2,29 @@ using GameFramework.Core;
 using GameFramework.Core.Data;
 using GameFramework.Core.GameFramework.Manager;
 using GameFramework.Events;
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Services.Authentication;
 using Unity.Services.Lobbies.Models;
-using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Game
 {
     public class GameLobbyManager : Singleton<GameLobbyManager>
     {
-        public List<LobbyPlayerData> _lobbyPLayerData = new List<LobbyPlayerData>();
+        public List<LobbyPlayerData> _lobbyPLayerData = new();
 
         private LobbyPlayerData localLobbyPlayerData;
 
         private LobbyData _lobbyData;
+
+        public int _maxPlayerSize = 30;
+
+        public bool IsHost => localLobbyPlayerData.Id == LobbyManager.Instance.GetHostId();
         private void OnEnable()
         {
             LobbyEvents.OnLobbyUpdated += OnLobbyUpdated;
         }
-
-
 
         private void OnDisable()
         {
@@ -40,9 +40,8 @@ namespace Game
         public async Task<bool> CreateLobby()
         {
             // Se crea un objeto LobbyPlayerData que representa los datos del jugador anfitrión.
-            LobbyPlayerData playerData = new LobbyPlayerData();
-            
-            playerData.Initialize(AuthenticationService.Instance.PlayerId, "HostPlayer");
+            localLobbyPlayerData = new LobbyPlayerData();
+            localLobbyPlayerData.Initialize(AuthenticationService.Instance.PlayerId, "HostPlayer");
             _lobbyData = new LobbyData();
             _lobbyData.Initialize(0);
 
@@ -50,7 +49,7 @@ namespace Game
             // - Tiempo límite del lobby: 30 segundos
             // - Se permite iniciar el juego automáticamente cuando todos los jugadores están listos (true)
             // - Los datos del jugador anfitrión se serializan y se envían al lobby para que los demás jugadores puedan acceder a ellos.
-            bool succeeded = await LobbyManager.Instance.CreateLobby(30, true, playerData.Serialize(), _lobbyData.Serialize() );
+            bool succeeded = await LobbyManager.Instance.CreateLobby(_maxPlayerSize, true, localLobbyPlayerData.Serialize(), _lobbyData.Serialize() );
 
             // Se devuelve el resultado de la creación del lobby.
             return succeeded;
@@ -60,10 +59,10 @@ namespace Game
         public async Task<bool> JoinLobby(string code)
         {
 
-            LobbyPlayerData playerData = new LobbyPlayerData();
-            playerData.Initialize(AuthenticationService.Instance.PlayerId, "JoinPlayer");
+            localLobbyPlayerData = new LobbyPlayerData();
+            localLobbyPlayerData.Initialize(AuthenticationService.Instance.PlayerId, "JoinPlayer");
             // Se llama al método JoinLobby del LobbyManager para unirse al lobby con el código proporcionado y los datos del jugador.
-            bool succeeded = await LobbyManager.Instance.JoinLobby(code, playerData.Serialize());
+            bool succeeded = await LobbyManager.Instance.JoinLobby(code, localLobbyPlayerData.Serialize());
 
             // Se devuelve el resultado de unirse al lobby.
             return succeeded;
@@ -71,15 +70,23 @@ namespace Game
 
         private void OnLobbyUpdated(Lobby lobby)
         {
+            // Obtiene los datos de los jugadores en el lobby
             List<Dictionary<string, PlayerDataObject>> playerData = LobbyManager.Instance.GetPlayersData();
             _lobbyPLayerData.Clear();
 
+            int numberOfPlayerReady = 0;
+
             foreach (Dictionary<string, PlayerDataObject> data in playerData)
             {
-                LobbyPlayerData lobbyPlayerData = new LobbyPlayerData();
+                LobbyPlayerData lobbyPlayerData = new();
                 lobbyPlayerData.Initialize(data);
 
+                if (lobbyPlayerData.IsReady)
+                {
+                    numberOfPlayerReady++;
+                }
 
+                // Comprueba si el jugador es el jugador local y lo almacena
                 if (lobbyPlayerData.Id == AuthenticationService.Instance.PlayerId)
                 {
                     localLobbyPlayerData = lobbyPlayerData;
@@ -91,7 +98,16 @@ namespace Game
             _lobbyData.Initialize(lobby.Data);
 
             Events.LobbyEvents.OnLobbyUpdated?.Invoke();
+
+            if(numberOfPlayerReady == lobby.Players.Count)
+            {
+                Events.LobbyEvents.OnLobbyReady?.Invoke();
+            }
+
+
         }
+
+
 
         public List<LobbyPlayerData> GetPlayers()
         {
@@ -113,8 +129,34 @@ namespace Game
         public async Task<bool> SetSelectedMap(int currentMapIndex)
         {
             _lobbyData.MapIndex = currentMapIndex;
+            
             return await LobbyManager.Instance.UpdateLobbyData(_lobbyData.Serialize());
         }
+
+        public async Task StartGame(string sceneName)
+        {
+            string RelayJoinCode = await RelayManager.Instance.CreateRelay(_maxPlayerSize);
+
+            _lobbyData.RelayJoinCode = RelayJoinCode;
+            await LobbyManager.Instance.UpdateLobbyData(_lobbyData.Serialize());
+
+            string allocationId = RelayManager.Instance.GetAllocationId();
+            string connectionData = RelayManager.Instance.GetConnectionData();
+            await LobbyManager.Instance.UpdatePlayerData(localLobbyPlayerData.Id, localLobbyPlayerData.Serialize(), allocationId, connectionData);
+
+            SceneManager.LoadSceneAsync(sceneName);
+        }
+
+        //private async Task<bool> JoinRelayServer(string relayJoinCode)
+        //{
+        //    await RelayManager.Instance.JoinRelay(relayJoinCode);
+        //    string allocationId = RelayManager.Instance.GetAllocationId();
+        //    string connectionData = RelayManager.Instance.GetConnectionData();
+
+        //    await LobbyManager.Instance.UpdatePlayerData(localLobbyPlayerData.Id, localLobbyPlayerData.Serialize(), allocationId, connectionData);
+
+        //    return true;
+        //}
     }
 
 }

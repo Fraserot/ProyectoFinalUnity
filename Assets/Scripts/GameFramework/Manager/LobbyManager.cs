@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Unity.Services.Authentication;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace GameFramework.Core.GameFramework.Manager
@@ -155,12 +154,14 @@ namespace GameFramework.Core.GameFramework.Manager
             return data;
         }
 
-        public async Task<bool> UpdatePlayerData(string playerID, Dictionary<string, string> data)
+        public async Task<bool> UpdatePlayerData(string playerID, Dictionary<string, string> data, string allocationId= default, string connectionData=default)
         {
             Dictionary<string, PlayerDataObject> playerData = SerializePlayerData(data);
             UpdatePlayerOptions options = new UpdatePlayerOptions()
             {
-                Data = playerData
+                Data = playerData,
+                AllocationId = allocationId,
+                ConnectionInfo = connectionData
             };
             try
             {
@@ -198,6 +199,11 @@ namespace GameFramework.Core.GameFramework.Manager
             LobbyEvents.OnLobbyUpdated(_lobby);
 
             return true;
+        }
+
+        public string GetHostId()
+        {
+            return _lobby.HostId;
         }
     }
 }

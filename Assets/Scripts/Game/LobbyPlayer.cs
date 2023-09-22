@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -11,10 +9,6 @@ namespace Game
         [SerializeField] private SpriteRenderer _isReady;
         private LobbyPlayerData _data;
 
-        private void Start()
-        {
-            // Puedes realizar cualquier inicialización aquí si es necesario
-        }
 
         public void SetData(LobbyPlayerData data)
         {
@@ -29,14 +23,6 @@ namespace Game
                     _isReady.color = Color.green;
                 }
             }
-            //else
-            //{
-            //    // Cambiar el sprite 2D a rojo (si es necesario)
-            //    if (_isReady != null)
-            //    {
-            //        _isReady.color = Color.red;
-            //    }
-            //}
 
             gameObject.SetActive(true);
         }

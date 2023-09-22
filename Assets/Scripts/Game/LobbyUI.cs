@@ -1,10 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using GameFramework.Core.Data;
-using System;
 using Game.Events;
 
 namespace Game 
@@ -13,6 +10,7 @@ namespace Game
     {
         [SerializeField] private TextMeshProUGUI _lobbyCodeText;
         [SerializeField] private Button _readyBtn;
+        [SerializeField] private Button _startBtn;
         [SerializeField] private Image _mapImage;
         [SerializeField] private Button _leftBtn;
         [SerializeField] private Button _rightBtn;
@@ -26,10 +24,18 @@ namespace Game
         private void OnEnable()
         {
             _readyBtn.onClick.AddListener(OnReadyPressed);
-            _rightBtn.onClick.AddListener(OnRightButtonClicked);
-            _leftBtn.onClick.AddListener(OnLeftButtonClicked);
 
-            LobbyEvents.OnLobbyUpdated += OnLobbyUpdated;
+            //Comprobacion para que solo el ID del host pueda cambiar el mapa
+            if (GameLobbyManager.Instance.IsHost)
+            {
+                _rightBtn.onClick.AddListener(OnRightButtonClicked);
+                _leftBtn.onClick.AddListener(OnLeftButtonClicked);
+                _startBtn.onClick.AddListener(OnStartBtnClicked);
+
+                LobbyEvents.OnLobbyUpdated += OnLobbyUpdated;
+                LobbyEvents.OnLobbyReady += OnLobbyReady;
+            }
+
         }
 
 
@@ -39,14 +45,23 @@ namespace Game
             _readyBtn.onClick.RemoveAllListeners();
             _rightBtn.onClick.RemoveAllListeners();
             _leftBtn.onClick.RemoveAllListeners();
+            _startBtn.onClick.RemoveAllListeners();
+
 
             LobbyEvents.OnLobbyUpdated -= OnLobbyUpdated;
+            LobbyEvents.OnLobbyReady -= OnLobbyReady;
+
 
 
         }
         void Start()
         {
             _lobbyCodeText.text = $"Codigo: {GameLobbyManager.Instance.GetLobbyCode()}";
+            if (!GameLobbyManager.Instance.IsHost)
+            {
+                _leftBtn.gameObject.SetActive(false);
+                _rightBtn.gameObject.SetActive(false);
+            }
         }
 
         private async void OnLeftButtonClicked()
@@ -61,7 +76,7 @@ namespace Game
             }
 
             UpdateMap();
-           await GameLobbyManager.Instance.SetSelectedMap(_currentMapIndex);
+            await GameLobbyManager.Instance.SetSelectedMap(_currentMapIndex);
         }
 
 
@@ -113,6 +128,14 @@ namespace Game
             _currentMapIndex =  GameLobbyManager.Instance.GetMapIndex();
             UpdateMap();
         }
+        private void OnLobbyReady()
+        {
+            _startBtn.gameObject.SetActive(true);
+        }
 
+        private async void OnStartBtnClicked()
+        {
+             await GameLobbyManager.Instance.StartGame(_mapSelectionData.Maps[_currentMapIndex].SceneName);
+        }
     }
 }
