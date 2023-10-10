@@ -22,7 +22,7 @@ namespace Game
 
         void Update()
         {
-            if (!IsOwner) return;
+            
 
             Vector2 movement = Vector2.zero;
 
@@ -50,13 +50,6 @@ namespace Game
             movement = movement.normalized;
             rb.velocity = new Vector2(movement.x * speed, movement.y * speed);
         }
-        //Confirmacion de camara Online
-        public override void OnNetworkSpawn()
-        {
-            cameraHolder.SetActive(IsOwner);
-            base.OnNetworkSpawn();
-        }
-
 
 
     }

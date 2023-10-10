@@ -61,6 +61,11 @@ namespace Game
                 _leftBtn.gameObject.SetActive(false);
                 _rightBtn.gameObject.SetActive(false);
             }
+            else
+            {
+                GameLobbyManager.Instance.SetSelectedMap(_currentMapIndex, _mapSelectionData.Maps[_currentMapIndex].SceneName);
+            }
+
         }
 
         private async void OnLeftButtonClicked()
