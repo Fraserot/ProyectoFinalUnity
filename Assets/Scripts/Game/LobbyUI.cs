@@ -53,7 +53,7 @@ namespace Game
 
 
         }
-        void Start()
+        async void Start()
         {
             _lobbyCodeText.text = $"Codigo: {GameLobbyManager.Instance.GetLobbyCode()}";
             if (!GameLobbyManager.Instance.IsHost)
@@ -63,7 +63,7 @@ namespace Game
             }
             else
             {
-                GameLobbyManager.Instance.SetSelectedMap(_currentMapIndex, _mapSelectionData.Maps[_currentMapIndex].SceneName);
+               await GameLobbyManager.Instance.SetSelectedMap(_currentMapIndex, _mapSelectionData.Maps[_currentMapIndex].SceneName);
             }
 
         }

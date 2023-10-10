@@ -49,7 +49,7 @@ namespace Game
         {
 
             string code = codeText.text;
-            code = code.Substring(0, code.Length - 1);
+            code = code[..^1];
 
             bool succeded = await GameLobbyManager.Instance.JoinLobby(code);
             if (succeded)

@@ -43,7 +43,7 @@ namespace Game
         public async Task<bool> CreateLobby()
         {
             // Se crea un objeto LobbyPlayerData que representa los datos del jugador anfitrión.
-            localLobbyPlayerData = new LobbyPlayerData();
+            localLobbyPlayerData = gameObject.AddComponent<LobbyPlayerData>();
             localLobbyPlayerData.Initialize(AuthenticationService.Instance.PlayerId, "HostPlayer");
             _lobbyData = new LobbyData();
             _lobbyData.Initialize(0);
@@ -62,7 +62,7 @@ namespace Game
         public async Task<bool> JoinLobby(string code)
         {
 
-            localLobbyPlayerData = new LobbyPlayerData();
+            localLobbyPlayerData = gameObject.AddComponent<LobbyPlayerData>();
             localLobbyPlayerData.Initialize(AuthenticationService.Instance.PlayerId, "JoinPlayer");
             // Se llama al método JoinLobby del LobbyManager para unirse al lobby con el código proporcionado y los datos del jugador.
             bool succeeded = await LobbyManager.Instance.JoinLobby(code, localLobbyPlayerData.Serialize());

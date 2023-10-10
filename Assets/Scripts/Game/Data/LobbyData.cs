@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Unity.Services.Lobbies.Models;
 namespace GameFramework.Core.Data
