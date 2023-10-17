@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f91f8878de5bf4245a6b09c644c6f82c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 4030143097966357573, guid: b7f2654061c7a524283726f23f8d36a4, type: 3}
+  playerPrefab: {fileID: 520089589186987741, guid: ab5f7f4ced7d40e488789ffa01457529, type: 3}
   clientID: 0
 --- !u!114 &6205339608072074375
 MonoBehaviour:
@@ -62,7 +62,7 @@ MonoBehaviour:
   GlobalObjectIdHash: 951099334
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
+  ActiveSceneSynchronization: 1
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0

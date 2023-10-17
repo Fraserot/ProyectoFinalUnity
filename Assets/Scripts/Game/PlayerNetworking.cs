@@ -5,34 +5,31 @@ using Quaternion = UnityEngine.Quaternion;
 using Unity.Netcode;
 using System.Security.Principal;
 
-namespace Game
+public class PlayerNetworking : NetworkBehaviour
 {
-    public class PlayerNetworking : NetworkBehaviour
+    public GameObject playerPrefab;
+    public int clientID;
+    private GameObject mPlayer;
+
+    public override void OnNetworkSpawn()
     {
-        public GameObject playerPrefab;
-        public int clientID;
-        private GameObject mPlayer;
+        base.OnNetworkSpawn();
 
-        public override void OnNetworkSpawn()
-        {
-            base.OnNetworkSpawn();
+        clientID = (int)OwnerClientId;
 
-            clientID = (int)OwnerClientId;
-
-            if (IsServer)
-                mPlayer = SpawnPlayer();
-        }
-
-
-        public GameObject SpawnPlayer()
-        {
-            GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint");
-
-            GameObject go = Instantiate(playerPrefab,
-                spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Length)].transform.position, Quaternion.identity);
-            go.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
-            return go;
-        }
-
+        if (IsServer)
+            mPlayer = SpawnPlayer();
     }
+
+
+    public GameObject SpawnPlayer()
+    {
+        GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint");
+
+        GameObject go = Instantiate(playerPrefab,
+            spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Length)].transform.position, Quaternion.identity);
+        go.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
+        return go;
+    }
+
 }

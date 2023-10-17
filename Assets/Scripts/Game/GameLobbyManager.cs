@@ -161,24 +161,14 @@ namespace Game
 
         }
 
-        public async Task JoinRelayServer(string relayJoinCode)
+        private async Task<bool> JoinRelayServer(string relayJoinCode)
         {
-            try
-            {
                 _inGame = true;
                 await RelayManager.Instance.JoinRelay(relayJoinCode);
                 string allocationId = RelayManager.Instance.GetAllocationId();
                 string connectionData = RelayManager.Instance.GetConnectionData();
-
                 await LobbyManager.Instance.UpdatePlayerData(localLobbyPlayerData.Id, localLobbyPlayerData.Serialize(), allocationId, connectionData);
-
-                
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error al unirse al servidor Relay: {ex.Message}");
-                
-            }
+                return true;
         }
 
     }
