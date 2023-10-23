@@ -15,6 +15,21 @@ namespace GameFramework.Core.GameFramework.Manager
         private Lobby _lobby; // Almacena la referencia al lobby creado.
         private Coroutine _heartBeatCoroutine;
         private Coroutine _refreshLobbyCoroutine;
+        private List<string> _joinLobbiesId;
+
+        public async Task<bool> HasActiveLobbies()
+        {
+            _joinLobbiesId = await LobbyService.Instance.GetJoinedLobbiesAsync();
+
+            if(_joinLobbiesId.Count > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
         public string GetLobbyCode()
         {
@@ -204,6 +219,40 @@ namespace GameFramework.Core.GameFramework.Manager
         public string GetHostId()
         {
             return _lobby.HostId;
+        }
+
+        public async Task<bool> RejoinLobby()
+        {
+            try
+            {
+                _lobby = await LobbyService.Instance.ReconnectToLobbyAsync(_joinLobbiesId[0]);
+                LobbyEvents.OnLobbyUpdated(_lobby);
+            }
+            catch(System.Exception)
+            {
+                return false;
+            }
+
+            _refreshLobbyCoroutine = StartCoroutine(RefreshLobbyCoroutine(_joinLobbiesId[0], 1f));
+            return true;
+        }
+
+        public async Task<bool> LeaveAllLobby()
+        {
+            string playerId = AuthenticationService.Instance.PlayerId;
+            foreach(string lobbyId in _joinLobbiesId)
+            {
+                try
+                {
+                    await LobbyService.Instance.RemovePlayerAsync(lobbyId, playerId);
+                }
+                catch (System.Exception)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }

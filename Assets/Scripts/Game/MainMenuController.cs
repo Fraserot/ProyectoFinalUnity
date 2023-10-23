@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -12,6 +13,8 @@ namespace Game
         [SerializeField] private GameObject JoinScreen;
         [SerializeField] private Button hostBtn;
         [SerializeField] private Button joinBtn;
+        [SerializeField] private Button reJoinBtn;
+        [SerializeField] private Button leaveBtn;
         [SerializeField] private Button sumbitCodeBtn;
         [SerializeField] private TextMeshProUGUI codeText;
         void OnEnable()
@@ -21,6 +24,7 @@ namespace Game
             sumbitCodeBtn.onClick.AddListener(OnSumbitCodeClick);
 
         }
+        
 
         private void OnDisable()
         {
@@ -29,8 +33,48 @@ namespace Game
             sumbitCodeBtn.onClick.RemoveListener(OnSumbitCodeClick);
 
         }
+        private async void Start()
+        {
+            if (await GameLobbyManager.Instance.HasActiveLobbies())
+            {
+                hostBtn.gameObject.SetActive(false);
+                joinBtn.gameObject.SetActive(false);
 
 
+                reJoinBtn.gameObject.SetActive(true);
+                leaveBtn.gameObject.SetActive(true);
+                reJoinBtn.onClick.AddListener(OnReJoinClick);
+                leaveBtn.onClick.AddListener(OnLeaveGameClick);
+
+            }
+        }
+
+        //Algunos errores, pero si funciona
+        private async void OnLeaveGameClick()
+        {
+            bool succeded = await GameLobbyManager.Instance.LeaveAllLobby();
+            if (succeded)
+            {
+                Debug.Log("Todos los lobbies han sido desconectados");
+                hostBtn.gameObject.SetActive(true);
+                joinBtn.gameObject.SetActive(true);
+
+
+                reJoinBtn.gameObject.SetActive(false);
+                leaveBtn.gameObject.SetActive(false);
+
+            }
+        }
+
+        private async void OnReJoinClick()
+        {
+            bool succeded = await GameLobbyManager.Instance.RejoinGame();
+            if (succeded)
+            {
+                SceneManager.LoadSceneAsync("Lobby");
+
+            }
+        }
         private async void OnHostClick()
         {
             bool succeded = await GameLobbyManager.Instance.CreateLobby();

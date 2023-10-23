@@ -33,6 +33,10 @@ namespace Game
         {
             LobbyEvents.OnLobbyUpdated -= OnLobbyUpdated;
         }
+        public async Task<bool> HasActiveLobbies()
+        {
+            return await LobbyManager.Instance.HasActiveLobbies();
+        }
         // Método para obtener el código del lobby desde el LobbyManager
         public string GetLobbyCode()
         {
@@ -171,6 +175,15 @@ namespace Game
                 return true;
         }
 
+        public async Task<bool> RejoinGame()
+        {
+            return await LobbyManager.Instance.RejoinLobby();
+        }
+
+        public async Task<bool> LeaveAllLobby()
+        {
+            return await LobbyManager.Instance.LeaveAllLobby();
+        }
     }
 
 }
