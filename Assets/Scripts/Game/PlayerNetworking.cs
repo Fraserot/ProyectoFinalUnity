@@ -9,7 +9,6 @@ public class PlayerNetworking : NetworkBehaviour
 {
     public GameObject playerPrefab;
     public int clientID;
-    private GameObject mPlayer;
 
     public override void OnNetworkSpawn()
     {
@@ -18,18 +17,23 @@ public class PlayerNetworking : NetworkBehaviour
         clientID = (int)OwnerClientId;
 
         if (IsServer)
-            mPlayer = SpawnPlayer();
+        {
+            // Buscar el jugador existente con la etiqueta "Player".
+            GameObject existingPlayer = GameObject.FindWithTag("Player");
+            // Si se encuentra un jugador existente, simplemente cambia su posición.
+            ChangePlayerPosition(existingPlayer);
+            
+        }
     }
 
 
-    public GameObject SpawnPlayer()
+    public void ChangePlayerPosition(GameObject player)
     {
-        GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint");
-
-        GameObject go = Instantiate(playerPrefab,
-            spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Length)].transform.position, Quaternion.identity);
-        go.GetComponent<NetworkObject>().SpawnWithOwnership(OwnerClientId);
-        return go;
+        if (player != null)
+        {
+            GameObject[] spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint");
+            Vector3 randomSpawnPoint = spawnPoints[UnityEngine.Random.Range(0, spawnPoints.Length)].transform.position;
+            player.transform.position = randomSpawnPoint;
+        }
     }
-
 }

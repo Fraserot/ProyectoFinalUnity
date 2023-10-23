@@ -12,15 +12,10 @@ public class PlayerMovement : NetworkBehaviour
     public GameObject cameraHolder;
     private int state;
 
-    private CharacterController _cc;
-    private PlayerMovement _playerControl;
 
     private void Start()
     {
         animator = GetComponent<Animator>();
-        _cc = GetComponent<CharacterController>();
-        _playerControl = new PlayerMovement();
-       
 
     }
 
@@ -60,6 +55,7 @@ public class PlayerMovement : NetworkBehaviour
         cameraHolder.SetActive(IsOwner);
         base.OnNetworkSpawn();
     }
+
 }
 
 
