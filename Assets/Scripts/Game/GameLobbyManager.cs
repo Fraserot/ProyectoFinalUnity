@@ -21,7 +21,9 @@ namespace Game
 
         public int _maxPlayerSize = 30;
 
-        public bool _inGame = false;
+        public bool _inGame;
+        private bool _wasDiscconected;
+        private string prevRelayCode;
 
         public bool IsHost => localLobbyPlayerData.Id == LobbyManager.Instance.GetHostId();
         private void OnEnable()
@@ -113,8 +115,20 @@ namespace Game
 
             if(_lobbyData.RelayJoinCode != default && !_inGame)
             {
-               await JoinRelayServer(_lobbyData.RelayJoinCode);
-               SceneManager.LoadSceneAsync(_lobbyData.SceneName);
+                if (_wasDiscconected)
+                {
+                    if(_lobbyData.RelayJoinCode != prevRelayCode)
+                    {
+                        await JoinRelayServer(_lobbyData.RelayJoinCode);
+                        SceneManager.LoadSceneAsync(_lobbyData.SceneName);
+                    }
+                }
+                else
+                {
+                    await JoinRelayServer(_lobbyData.RelayJoinCode);
+                    SceneManager.LoadSceneAsync(_lobbyData.SceneName);
+                }
+               
             }
 
             Console.WriteLine($"Nombre de la escena actual: {_lobbyData.SceneName}");
@@ -158,6 +172,9 @@ namespace Game
 
             string allocationId = RelayManager.Instance.GetAllocationId();
             string connectionData = RelayManager.Instance.GetConnectionData();
+            //Borrar en caso de que falle
+
+            localLobbyPlayerData.IsReady = false;
             await LobbyManager.Instance.UpdatePlayerData(localLobbyPlayerData.Id, localLobbyPlayerData.Serialize(), allocationId, connectionData);
 
             SceneManager.LoadSceneAsync(_lobbyData.SceneName);
@@ -171,6 +188,8 @@ namespace Game
                 await RelayManager.Instance.JoinRelay(relayJoinCode);
                 string allocationId = RelayManager.Instance.GetAllocationId();
                 string connectionData = RelayManager.Instance.GetConnectionData();
+            //Borrar en caso de que falle
+                localLobbyPlayerData.IsReady = false;
                 await LobbyManager.Instance.UpdatePlayerData(localLobbyPlayerData.Id, localLobbyPlayerData.Serialize(), allocationId, connectionData);
                 return true;
         }
@@ -183,6 +202,21 @@ namespace Game
         public async Task<bool> LeaveAllLobby()
         {
             return await LobbyManager.Instance.LeaveAllLobby();
+        }
+
+        public async void GoBackToLobby(bool disconnected)
+        {
+            _inGame = false;
+            _wasDiscconected = disconnected;
+
+            if (_wasDiscconected)
+            {
+                prevRelayCode = _lobbyData.RelayJoinCode;
+            }
+
+            localLobbyPlayerData.IsReady = false;
+            await LobbyManager.Instance.UpdatePlayerData(localLobbyPlayerData.Id, localLobbyPlayerData.Serialize());
+            SceneManager.LoadSceneAsync("Lobby");
         }
     }
 
