@@ -389,8 +389,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Cargando....
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a41ef1af789709a4fa8fa0f93e2bd19d, type: 2}
-  m_sharedMaterial: {fileID: -4324869239369881977, guid: a41ef1af789709a4fa8fa0f93e2bd19d, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 894faae4cca2326b8bc6f2f40d87c1cd, type: 2}
+  m_sharedMaterial: {fileID: -5954265478924105757, guid: 894faae4cca2326b8bc6f2f40d87c1cd, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -515,7 +515,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.39248598, g: 0.2761659, b: 0.5471698, a: 1}
+  m_Color: {r: 0.33333334, g: 0.16078432, b: 0.8352941, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
