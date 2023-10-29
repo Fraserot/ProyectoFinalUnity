@@ -55,7 +55,13 @@ public class GameManager : MonoBehaviour
 
     private void OnClientDisconnected(ulong obj)
     {
-        if(NetworkManager.Singleton.LocalClientId == obj)
+        // Si eres el anfitrión de la partida, no debes salir del juego cuando se desconecte un cliente.
+        if (NetworkManager.Singleton.IsHost)
+        {
+            return;
+        }
+
+        if (NetworkManager.Singleton.LocalClientId == obj)
         {
             Debug.Log("No estoy conectado");
             //Salir del juego si no hay conecciones
